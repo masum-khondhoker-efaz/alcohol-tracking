@@ -1,1 +1,25 @@
 # alcohol-tracking
+# Notification
+Manages user notifications through its controller, routes, and service files.
+# Auth
+Handles user authentication processes, including login mechanisms and validation schemas.
+# Blog
+Facilitates creating and managing blog posts, allowing users to share experiences and insights.
+
+# Challenge
+Enables users to participate in or create challenges, fostering community engagement and motivation.
+
+# Drink
+Tracks individual drink entries, recording details about consumption.
+
+# DrinkUnits 
+Defines measurement units for drinks, standardizing consumption tracking.
+
+# Goal 
+Allows users to set and monitor personal objectives related to their drinking habits.
+
+# Group
+Supports the creation and management of user groups, promoting social support networks. Users can group chat send files.
+
+# User
+Manages user profiles and related functionalities.

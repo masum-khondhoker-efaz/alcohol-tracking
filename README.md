@@ -1,6 +1,6 @@
 # Alcohol-Tracking
 # Notification
-Manages user notifications through its controller, routes, and service files.
+Admin can send notifications to selected users.
 # Auth
 Handles user authentication processes, including login mechanisms and validation schemas.
 # Blog

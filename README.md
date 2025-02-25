@@ -1,4 +1,4 @@
-# alcohol-tracking
+# Alcohol-Tracking
 # Notification
 Manages user notifications through its controller, routes, and service files.
 # Auth
@@ -12,7 +12,7 @@ Enables users to participate in or create challenges, fostering community engage
 # Drink
 Tracks individual drink entries, recording details about consumption.
 
-# DrinkUnits 
+# Drink Units 
 Defines measurement units for drinks, standardizing consumption tracking.
 
 # Goal 

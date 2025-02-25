@@ -1,0 +1,222 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  fullName  String
+  email     String       @unique
+  password  String?
+  role      UserRoleEnum @default(USER)
+  status    UserStatus   @default(INACTIVE)
+  phone     String?
+  image     String?
+  otp       Int?
+  otpExpiry DateTime?
+  fcmToken  String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  // Relationships
+  roomsSent        Room[]         @relation("SenderRelation")
+  roomsReceived    Room[]         @relation("ReceiverRelation")
+  roomParticipants RoomUser[]
+  chatsSent        Chat[]         @relation("SenderRelation")
+  chatsReceived    Chat[]         @relation("ReceiverRelation")
+  notifications    Notification[]
+  categories       Category[]
+  blogs            Blog[]
+  challenges       Challenge[]
+  Goal             Goal[]
+  drinks           Drink[]
+  createdRooms     Room[]         @relation("CreatorRelation")
+  DrinkUnits       DrinkUnits[]
+
+  @@map("users")
+}
+
+model RoomUser {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  roomId String @db.ObjectId
+  userId String @db.ObjectId
+  room   Room   @relation(fields: [roomId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@unique([userId, roomId])
+  @@map("room_users")
+}
+
+model Room {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  type             RoomType @default(GROUP) // Type: One-to-one or Group chat
+  groupName        String? // Name of the group (for group chats)
+  groupDescription String? // Description of the group (for group chats)
+  groupImage       String? // Image of the group (for group chats)
+  senderId         String?  @db.ObjectId
+  receiverId       String?  @db.ObjectId
+  creatorId        String   @db.ObjectId
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sender   User? @relation("SenderRelation", fields: [senderId], references: [id])
+  receiver User? @relation("ReceiverRelation", fields: [receiverId], references: [id])
+  creator  User  @relation("CreatorRelation", fields: [creatorId], references: [id])
+
+  participants RoomUser[] // Relationship to participants (RoomUser table)
+  chat         Chat[]
+
+  @@map("rooms")
+}
+
+model Chat {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  senderId   String   @db.ObjectId
+  receiverId String?  @db.ObjectId // Nullable for group chats
+  roomId     String   @db.ObjectId
+  message    String
+  images     String[]
+  isRead     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Relationships
+  sender   User  @relation("SenderRelation", fields: [senderId], references: [id])
+  receiver User? @relation("ReceiverRelation", fields: [receiverId], references: [id]) // Optional for group chats
+  room     Room  @relation(fields: [roomId], references: [id])
+
+  @@map("chats")
+}
+
+model Category {
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId       String   @db.ObjectId
+  categoryName String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("categories")
+}
+
+model Blog {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  title     String
+  body      String
+  image     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("blogs")
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  title     String
+  body      String
+  data      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("notifications")
+}
+
+model Challenge {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  title     String
+  body      String
+  count     Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  goals     Goal[]
+
+  @@map("challenges")
+}
+
+model Goal {
+  id          String          @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String          @db.ObjectId
+  challengeId String          @db.ObjectId
+  status      ChallengeStatus @default(PENDING)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id])
+  challenge   Challenge       @relation(fields: [challengeId], references: [id])
+
+  @@map("goals")
+}
+
+model Drink {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  dayType   DayType  @default(NORMAL_DAY)
+  date      DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("drinks")
+}
+
+model DrinkUnits {
+  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String   @db.ObjectId
+  name              String
+  alcoholPercentage Float
+  container_type    String
+  size              Float
+  units             Int
+  totalUnits        Int?
+  dayType           DayType  @default(ALCOHOL_DAY)
+  date              DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id])
+
+  @@map("drink_units")
+}
+
+enum UserRoleEnum {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  BLOCKED
+}
+
+enum RoomType {
+  ONE_TO_ONE
+  GROUP
+}
+
+enum ChallengeStatus {
+  PENDING
+  STARTED
+  NOT_COMPLETED
+  COMPLETED
+}
+
+enum DayType {
+  NORMAL_DAY
+  DRY_DAY
+  ALCOHOL_DAY
+}

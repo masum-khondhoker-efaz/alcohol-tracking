@@ -1,5 +1,5 @@
 # Alcohol-Tracking
- Built a user-friendly platform with features like tracking dry and alcohol days, alcohol units, real-time chat, reading blogs, and subscription plan integration, ensuring a smooth user experience.
+ Built a user-friendly platform with features like tracking dry and alcohol days, and alcohol units, setting goals to meet challenges, real-time chat, reading blogs, and subscription plan integration, ensuring a smooth user experience.
 
 # Notification
 Admin can send notifications to selected users.
